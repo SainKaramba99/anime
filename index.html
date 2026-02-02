@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moja Anime Lista</title>
+
+<style>
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    background: #e9e1d8;
+    color: #4a3f36;
+}
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #fdfaf6;
+    padding: 25px;
+    border-radius: 22px;
+    box-shadow: 0 12px 30px rgba(120,95,70,.35);
+}
+h1 { text-align: center; color: #7a5c45; }
+h2 {
+    color: #8b6d55;
+    border-bottom: 2px solid #e3d6c9;
+    margin-top: 30px;
+}
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 14px;
+    border: 1px solid #d8c6b6;
+    background: #f6efe8;
+}
+.add-form input,
+.add-form textarea {
+    max-width: 880px;
+}
+button {
+    padding: 8px 14px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(#d4b89d, #bfa187);
+    font-weight: 600;
+    cursor: pointer;
+}
+.anime-item {
+    background: #f7f1eb;
+    border-radius: 18px;
+    padding: 16px;
+    margin-top: 15px;
+    position: relative;
+}
+.menu-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    position: absolute;
+    top: 20px;
+}
+.menu-btn:first-of-type { right: 60px; }
+.menu-btn:last-of-type { right: 20px; }
+
+.action-menu {
+    position: absolute;
+    right: 16px;
+    top: 42px;
+    background: #fdfaf6;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.2);
+    display: none;
+    z-index: 20;
+}
+.action-menu.active { display: block; }
+.action-menu button {
+    background: none;
+    border: none;
+    padding: 10px 16px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+}
+
+.season-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 6px;
+}
+.season-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #e2cbb4;
+    border-radius: 999px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+.season-badge {
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+.edit-area {
+    display: none;
+    background: #efe5db;
+    padding: 12px;
+    border-radius: 16px;
+    margin-top: 10px;
+}
+.edit-season {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+.modal-content {
+    max-width: 80%;
+    max-height: 80%;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+}
+.close-btn, .edit-poster-btn {
+    position: absolute;
+    top: 20px;
+    background: none;
+    border: none;
+    font-size: 30px;
+    color: white;
+    cursor: pointer;
+}
+.close-btn { right: 20px; }
+.edit-poster-btn { right: 60px; }
+/* ====== ANIMACJE & EFEKTY ====== */
+
+button {
+    transition: 
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease,
+        opacity 0.2s ease;
+}
+
+button:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 18px rgba(120,95,70,.35);
+}
+
+button:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 8px rgba(120,95,70,.25);
+}
+
+/* Karty anime */
+.anime-item {
+    transition: 
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.anime-item:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 18px 38px rgba(120,95,70,.45);
+}
+
+/* Menu zębatki – płynne pojawianie */
+.action-menu {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+    pointer-events: none;
+    transition:
+        opacity 0.25s ease,
+        transform 0.3s cubic-bezier(0.22,1.2,0.36,1);
+}
+
+.action-menu.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Ikony (⚙️ 🖼️ 🖌️) */
+.menu-btn {
+    transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.menu-btn:hover {
+    transform: scale(1.2) rotate(-5deg);
+    color: #7a5c45;
+}
+
+/* Edycja – miękkie wysuwanie */
+.edit-area {
+    animation: fadeSlide 0.35s ease;
+}
+
+@keyframes fadeSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal – delikatny zoom */
+.modal-content {
+    animation: zoomIn 0.35s ease;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Sezony – hover */
+.season-row {
+    transition: background 0.2s ease, border-radius 0.2s ease;
+    padding: 4px 6px;
+}
+
+.season-row:hover {
+    background: rgba(226,203,180,.35);
+    border-radius: 10px;
+}
+
+/* Badge obejrzane */
+.season-badge {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.season-badge:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 14px rgba(120,95,70,.35);
+}
+/* ====== KOMPAKTOWE MENU ZĘBATKI ====== */
+
+.action-menu {
+    min-width: 160px;
+    padding: 6px;
+    background: #f6efe8;
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(120,95,70,.35);
+}
+
+/* przyciski w menu */
+.action-menu button {
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: auto;
+    color: #4a3f36;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+/* hover – delikatny, bez „białej plamy” */
+.action-menu button:hover {
+    background: rgba(226,203,180,.45);
+    transform: translateX(2px);
+}
+
+/* usuń efekt pełnej szerokości */
+.action-menu button::before {
+    display: none;
+}
+/* ====== IKONY 🖼️ ⚙️ – MNIEJSZY HITBOX ====== */
+
+.menu-btn {
+    padding: 4px;               /* było za duże */
+    border-radius: 10px;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* hover – subtelny, bez białej bańki */
+.menu-btn:hover {
+    background: rgba(226,203,180,.35);
+    box-shadow: none;
+    transform: scale(1.1);
+}
+
+/* active – bez „puchnięcia” */
+.menu-btn:active {
+    transform: scale(0.95);
+    background: rgba(226,203,180,.45);
+}
+
+/* usuń wszelkie pseudo-efekty */
+.menu-btn::before,
+.menu-btn::after {
+    display: none !important;
+}
+/* ====== EDYCJA ANIME – KRÓTSZE INPUTY ====== */
+.edit-area > input,
+.edit-area > textarea {
+    max-width: 820px;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* ====== EDYCJA – LICZBA ODCINKÓW ====== */
+.edit-season {
+    flex-wrap: nowrap;
+}
+
+.edit-season input[type="number"] {
+    max-width: 90px;
+    flex-shrink: 0;
+}
+/* ====== USTAWIENIA LISTY ====== */
+
+.list-settings {
+    margin-top: 20px;
+}
+
+.settings-toggle {
+    width: 100%;
+    background: linear-gradient(#d4b89d, #bfa187);
+    border-radius: 16px;
+    padding: 10px 14px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.settings-panel {
+    display: none;
+    margin-top: 12px;
+    background: #efe5db;
+    border-radius: 18px;
+    padding: 16px;
+    animation: fadeSlide 0.35s ease;
+}
+
+.settings-icons {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    font-size: 28px;
+    text-align: center;
+}
+
+.settings-icons span {
+    background: #f7f1eb;
+    border-radius: 14px;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.settings-icons span:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(120,95,70,.35);
+}
+
+.settings-icons span {
+    user-select: none;
+}
+
+/* ====== STATYSTYKI ====== */
+
+.stats-content {
+    min-width: 320px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #4a3f36;
+}
+
+.stats-content h2 {
+    text-align: center;
+    margin-bottom: 14px;
+}
+
+.stats-row {
+    background: #f7f1eb;
+    border-radius: 14px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stats-row span {
+    font-size: 20px;
+}
+
+.stats-big {
+    font-size: 22px;
+}
+
+/* ====== DARK MODE ====== */
+
+body.dark {
+    background: #1e1c1a;
+    color: #e6dfd7;
+}
+
+body.dark .container {
+    background: #2a2623;
+    box-shadow: 0 12px 30px rgba(0,0,0,.6);
+}
+
+body.dark h1,
+body.dark h2 {
+    color: #e2cbb4;
+    border-color: #3a3531;
+}
+
+body.dark input,
+body.dark textarea {
+    background: #3a3531;
+    color: #f2ece6;
+    border-color: #4a433d;
+}
+
+body.dark .anime-item {
+    background: #322e2a;
+}
+
+body.dark .action-menu {
+    background: #3a3531;
+}
+
+body.dark .season-badge {
+    background: #4a433d;
+}
+
+body.dark .settings-panel {
+    background: #322e2a;
+}
+
+body.dark .settings-icons span {
+    background: #3a3531;
+}
+
+body.dark .stats-row {
+    background: #3a3531;
+}
+
+body.dark .modal-content {
+    background: #2a2623;
+    color: #f2ece6;
+}
+
+/* ====== DARK MODE – MENU ZĘBATKI ====== */
+
+body.dark .action-menu button {
+    color: #f2ece6;
+}
+
+body.dark .action-menu button:hover {
+    background: rgba(226,203,180,.25);
+}
+
+/* ====== DARK MODE – EDYCJA ANIME ====== */
+
+body.dark .edit-area {
+    background: #26221f;
+    border: 1px solid #3a3531;
+}
+
+body.dark .edit-area input,
+body.dark .edit-area textarea {
+    background: #322e2a;
+    color: #f2ece6;
+    border-color: #4a433d;
+}
+
+body.dark .edit-area strong {
+    color: #e2cbb4;
+}
+
+.add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* tu sterujesz interlinią */
+}
+
+.add-form input,
+.add-form textarea {
+    margin: 0; /* wyłączamy stare marginesy */
+}
+
+.add-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; /* tu sterujesz interlinią */
+}
+
+.add-form input,
+.add-form textarea {
+    margin: 0; /* wyłączamy stare marginesy */
+}
+
+.add-season-modal input {
+    max-width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Moja Anime Lista</h1>
+
+<div class="add-form">
+    <input id="title" placeholder="Tytuł anime">
+    <textarea id="note" placeholder="Opis / notatki"></textarea>
+    <input id="totalEpisodes" type="number" placeholder="Liczba odcinków sezonu 1">
+    <input id="poster" placeholder="URL plakatu (opcjonalnie)">
+    <button onclick="addAnime()">Dodaj anime</button>
+</div>
+
+<h2>Oglądam</h2>
+<div id="watching"></div>
+
+<h2>Obejrzane</h2>
+<div id="completed"></div>
+<div class="list-settings">
+    <button class="settings-toggle" onclick="toggleListSettings()">
+        🛠️ Ustawienia listy
+    </button>
+
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-icons">
+            <span onclick="exportAnimeJSON()" title="Export JSON">📤</span>
+            <span onclick="importAnimeJSON()" title="Import JSON">📥</span>
+            <span onclick="showStats()" title="Statystyki">📊</span>
+            <span onclick="toggleDarkMode()" title="Tryb nocny">🌙</span>
+            <span onclick="showAuthor()" title="Dobre słowo od twórcy stronki">🔒</span>
+
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- MODAL STATYSTYK -->
+<div id="statsModal" class="modal">
+    <button class="close-btn" onclick="closeStats()">✖</button>
+    <div class="modal-content stats-content">
+        <h2>📊 Statystyki</h2>
+        <div id="statsBody"></div>
+    </div>
+</div>
+
+<!-- MODAL PLAKATU -->
+<div id="posterModal" class="modal">
+    <button class="close-btn" onclick="closeModal()">✖</button>
+    <button class="edit-poster-btn" onclick="changePoster()">🖌️</button>
+    <img id="modalImage" class="modal-content">
+</div>
+
+<!-- MODAL POTWIERDZENIA USUNIĘCIA -->
+<div id="confirmModal" class="modal">
+    <div class="modal-content" style="max-width: 420px; text-align:center;">
+        <h2>🗑️ Usunąć anime?</h2>
+        <p id="confirmText">Czy na pewno chcesz usunąć to anime?</p>
+
+        <div style="margin-top:20px; display:flex; gap:12px; justify-content:center;">
+            <button onclick="confirmDelete()">Tak, usuń</button>
+            <button onclick="closeConfirm()">Anuluj</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL AUTORA -->
+<div id="authorModal" class="modal">
+    <button class="close-btn" onclick="closeAuthor()">✖</button>
+
+    <div class="modal-content stats-content">
+        <h2>🤡 by Sain 🤡
+
+        <div id="authorText">
+            <!-- ✏️ EDYTUJ TEKST AUTORA TUTAJ -->
+            <p><strong></strong> Hejka tu Sain</p>
+            <p>Chodź pograć w Arknight Endfield</p>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DODAJ SEZON -->
+<div id="addSeasonModal" class="modal">
+    <div class="modal-content add-season-modal" style="max-width: 360px;">
+        <h2>➕ Dodaj sezon</h2>
+
+        <input id="seasonNameInput" placeholder="Nazwa sezonu (opcjonalnie)">
+        <input id="seasonEpisodesInput" type="number" min="1" placeholder="Liczba odcinków">
+
+        <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end;">
+            <button onclick="closeAddSeason()">Anuluj</button>
+            <button onclick="confirmAddSeason()">Dodaj</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPosterAnimeIndex = null;
+
+function addAnime() {
+    const title = document.getElementById('title').value.trim();
+    const total = parseInt(document.getElementById('totalEpisodes').value);
+    if (!title || !total) return;
+
+    const list = JSON.parse(localStorage.getItem('animeList') || '[]');
+    list.push({
+        title,
+        note: note.value,
+        poster: poster.value,
+        seasons: [{ name:'Sezon 1', episodes:0, totalEpisodes: total }]
+    });
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
+function delAnime(i) {
+    if (!confirm('Usunąć to anime?')) return;
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list.splice(i,1);
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
+function delSeason(i, si) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+
+    if (list[i].seasons.length === 1) {
+        alert('Anime musi mieć przynajmniej jeden sezon.');
+        return;
+    }
+
+    list[i].seasons.splice(si, 1);
+
+
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+
+    // 🔥 kluczowa linia
+    setTimeout(() => toggleEdit(i), 0);
+}
+
+function showPoster(i) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    currentPosterAnimeIndex = i;
+    modalImage.src = list[i].poster;
+    posterModal.style.display = 'flex';
+}
+
+function changePoster() {
+    const url = prompt('Podaj nowy URL plakatu:');
+    if (!url) return;
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list[currentPosterAnimeIndex].poster = url;
+    localStorage.setItem('animeList', JSON.stringify(list));
+    modalImage.src = url;
+    loadList();
+}
+
+function closeModal(){ posterModal.style.display='none'; }
+
+function toggleMenuForAnime(e,i){
+    e.stopPropagation();
+    document.querySelectorAll('.action-menu').forEach(m=>m.classList.remove('active'));
+    document.getElementById(`menu-${i}`).classList.toggle('active');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.action-menu').forEach(m=>m.classList.remove('active')));
+
+function toggleEdit(i){
+    const el=document.getElementById(`edit-${i}`);
+    el.style.display=el.style.display==='block'?'none':'block';
+}
+
+function ep(i,si,c){
+    const list=JSON.parse(localStorage.getItem('animeList'));
+    const s=list[i].seasons[si];
+    if(s.episodes+c>=0 && s.episodes+c<=s.totalEpisodes) s.episodes+=c;
+    localStorage.setItem('animeList',JSON.stringify(list));
+    loadList();
+}
+
+function saveEdit(i){
+    const list=JSON.parse(localStorage.getItem('animeList'));
+    list[i].title=document.getElementById(`title-${i}`).value.trim();
+    list[i].note=document.getElementById(`note-${i}`).value;
+    document.querySelectorAll(`#edit-${i} .edit-season input`)
+        .forEach((inp,si)=>{
+            list[i].seasons[si].totalEpisodes=parseInt(inp.value);
+            if(list[i].seasons[si].episodes>inp.value)
+                list[i].seasons[si].episodes=inp.value;
+        });
+    localStorage.setItem('animeList',JSON.stringify(list));
+    loadList();
+}
+
+function loadList(){
+    let list = JSON.parse(localStorage.getItem('animeList') || '[]');
+
+    list.sort((a, b) =>
+        a.title.localeCompare(b.title, 'pl', { sensitivity: 'base' })
+    );
+    watching.innerHTML=completed.innerHTML='';
+    list.forEach((a,i)=>{
+        const done=a.seasons.every(s=>s.episodes===s.totalEpisodes);
+        const el=document.createElement('div');
+        el.className='anime-item';
+
+        let seasonsHTML='';
+        a.seasons.forEach((s,si)=>{
+            seasonsHTML+=done
+            ? `<span class="season-badge">${s.name} · ${s.episodes}/${s.totalEpisodes}</span>`
+            : `<div class="season-row">
+                <strong>${s.name}</strong>
+                <button onclick="ep(${i},${si},-1)">◀</button>
+                <strong>${s.episodes}/${s.totalEpisodes}</strong>
+                <button onclick="ep(${i},${si},1)">▶</button>
+               </div>`;
+        });
+
+        el.innerHTML=`
+        <strong>${a.title}</strong>
+        ${a.poster?`<button class="menu-btn" onclick="showPoster(${i})">🖼️</button>`:''}
+        <button class="menu-btn" onclick="toggleMenuForAnime(event,${i})">⚙️</button>
+
+        <div class="action-menu" id="menu-${i}">
+            <button onclick="toggleEdit(${i})">✏️ Edytuj</button>
+            <button onclick="askDelete(${i})">🗑️ Usuń anime</button>
+        </div>
+
+        <p>${a.note||''}</p>
+        ${seasonsHTML}
+
+        <div class="edit-area" id="edit-${i}">
+            <input id="title-${i}" value="${a.title}">
+            <textarea id="note-${i}">${a.note||''}</textarea>
+
+            ${a.seasons.map((s,si)=>`
+            <div class="edit-season">
+                <strong>${s.name}</strong>
+                <input type="number" value="${s.totalEpisodes}">
+                <button onclick="delSeason(${i},${si})">🗑️</button>
+            </div>`).join('')}
+
+            <button onclick="openAddSeason(${i})">➕ Dodaj sezon</button>
+            <button onclick="saveEdit(${i})">💾 Zapisz</button>
+        </div>
+        `;
+        (done?completed:watching).appendChild(el);
+    });
+    localStorage.setItem('animeList',JSON.stringify(list));
+}
+loadList();
+
+function toggleListSettings() {
+    const panel = document.getElementById('settingsPanel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+}
+
+function exportAnimeJSON() {
+    const data = localStorage.getItem('animeList');
+
+    if (!data || data === '[]') {
+        alert('Lista anime jest pusta.');
+        return;
+    }
+
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'moja-anime-lista.json';
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function importAnimeJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+
+    input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+            try {
+                const data = JSON.parse(ev.target.result);
+
+                if (!Array.isArray(data)) {
+                    alert('Nieprawidłowy plik JSON.');
+                    return;
+                }
+
+                if (!confirm('Import zastąpi aktualną listę. Kontynuować?')) return;
+
+                localStorage.setItem('animeList', JSON.stringify(data));
+                loadList();
+            } catch (err) {
+                alert('Błąd podczas wczytywania pliku JSON.');
+            }
+        };
+
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
+function showStats() {
+    const list = JSON.parse(localStorage.getItem('animeList') || '[]');
+
+    if (list.length === 0) {
+        alert('Brak danych do statystyk.');
+        return;
+    }
+
+    let totalAnime = list.length;
+    let completedAnime = 0;
+    let totalEpisodes = 0;
+    let watchedEpisodes = 0;
+
+    list.forEach(a => {
+        let done = true;
+        a.seasons.forEach(s => {
+            totalEpisodes += s.totalEpisodes;
+            watchedEpisodes += s.episodes;
+            if (s.episodes !== s.totalEpisodes) done = false;
+        });
+        if (done) completedAnime++;
+    });
+
+    const percent = totalEpisodes
+        ? Math.round((watchedEpisodes / totalEpisodes) * 100)
+        : 0;
+
+    statsBody.innerHTML = `
+        <div class="stats-row stats-big">🎬 Anime <span>${totalAnime}</span></div>
+        <div class="stats-row">✅ Obejrzane <span>${completedAnime}</span></div>
+        <div class="stats-row">👀 W trakcie <span>${totalAnime - completedAnime}</span></div>
+
+        <div class="stats-row stats-big">📺 Odcinki</div>
+        <div class="stats-row">✔️ Obejrzane <span>${watchedEpisodes}</span></div>
+        <div class="stats-row">📦 Wszystkie <span>${totalEpisodes}</span></div>
+
+        <div class="stats-row stats-big">📈 Ukończenie <span>${percent}%</span></div>
+    `;
+
+    statsModal.style.display = 'flex';
+}
+
+function closeStats() {
+    statsModal.style.display = 'none';
+}
+
+statsModal.addEventListener('click', e => {
+    if (e.target === statsModal) closeStats();
+});
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    localStorage.setItem(
+        'darkMode',
+        document.body.classList.contains('dark')
+    );
+}
+
+// przy starcie strony
+if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark');
+}
+
+posterModal.addEventListener('click', e => {
+    if (e.target === posterModal) closeModal();
+});
+
+let animeToDelete = null;
+
+function askDelete(i) {
+    animeToDelete = i;
+    document.getElementById('confirmModal').style.display = 'flex';
+}
+
+function confirmDelete() {
+    if (animeToDelete === null) return;
+
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list.splice(animeToDelete, 1);
+    localStorage.setItem('animeList', JSON.stringify(list));
+
+    animeToDelete = null;
+    closeConfirm();
+    loadList();
+}
+
+function closeConfirm() {
+    document.getElementById('confirmModal').style.display = 'none';
+    animeToDelete = null;
+}
+
+function showAuthor() {
+    document.getElementById('authorModal').style.display = 'flex';
+}
+
+function closeAuthor() {
+    document.getElementById('authorModal').style.display = 'none';
+}
+
+authorModal.addEventListener('click', e => {
+    if (e.target === authorModal) closeAuthor();
+});
+addSeasonModal.addEventListener('click', e => {
+    if (e.target === addSeasonModal) closeAddSeason();
+});
+
+let addSeasonAnimeIndex = null;
+
+function openAddSeason(i) {
+    addSeasonAnimeIndex = i;
+
+    seasonNameInput.value = '';
+    seasonEpisodesInput.value = '';
+
+    document.getElementById('addSeasonModal').style.display = 'flex';
+}
+
+function closeAddSeason() {
+    document.getElementById('addSeasonModal').style.display = 'none';
+    addSeasonAnimeIndex = null;
+}
+
+function confirmAddSeason() {
+    const total = parseInt(seasonEpisodesInput.value);
+    if (!total || total <= 0) return;
+
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    const anime = list[addSeasonAnimeIndex];
+
+	const usedNumbers = anime.seasons
+		.map(s => {
+			const match = s.name.match(/\d+/);
+			return match ? parseInt(match[0]) : null;
+		})
+		.filter(n => n !== null);
+
+	let n = 1;
+	while (usedNumbers.includes(n)) {
+		n++;
+	}
+    anime.seasons.push({
+        name: seasonNameInput.value.trim() || `Sezon ${n}`,
+        episodes: 0,
+        totalEpisodes: total
+    });
+	sortSeasons(anime.seasons);
+    localStorage.setItem('animeList', JSON.stringify(list));
+    closeAddSeason();
+    loadList();
+}
+
+function sortSeasons(seasons) {
+    return seasons.sort((a, b) => {
+        const na = parseInt(a.name.match(/\d+/)?.[0]);
+        const nb = parseInt(b.name.match(/\d+/)?.[0]);
+
+        return (isNaN(na) ? 999 : na) - (isNaN(nb) ? 999 : nb);
+    });
+}
+
+</script>
+
+</body>
+</html>
