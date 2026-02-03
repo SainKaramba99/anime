@@ -27,7 +27,7 @@ h2 {
     margin-top: 30px;
 }
 input, textarea {
-    width: 100%;
+    width: 97.5%;
     padding: 10px;
     margin: 6px 0;
     border-radius: 14px;
@@ -51,7 +51,8 @@ button {
     border-radius: 18px;
     padding: 16px;
     margin-top: 15px;
-    position: relative;
+    position: relative;    /* już było */
+    overflow: visible;     /* dodaj – menu nie będzie przycinane */
 }
 .menu-btn {
     background: none;
@@ -68,12 +69,14 @@ button {
     position: absolute;
     right: 16px;
     top: 42px;
-    background: #fdfaf6;
+    background: #fdfaf6;  /* lub ciemniejsze w dark mode */
     border-radius: 12px;
     box-shadow: 0 10px 24px rgba(0,0,0,.2);
     display: none;
-    z-index: 20;
+    z-index: 9999;   /* <--- kluczowa zmiana */
+    overflow: visible; /* dla pewności */
 }
+
 .action-menu.active { display: block; }
 .action-menu button {
     background: none;
@@ -133,15 +136,17 @@ button {
     padding: 20px;
     border-radius: 12px;
 }
-.close-btn, .edit-poster-btn {
+.close-btn {
     position: absolute;
     top: 20px;
+    right: 20px;
     background: none;
     border: none;
     font-size: 30px;
     color: white;
     cursor: pointer;
 }
+
 .close-btn { right: 20px; }
 .edit-poster-btn { right: 60px; }
 /* ====== ANIMACJE & EFEKTY ====== */
@@ -333,7 +338,7 @@ button:active {
 /* ====== USTAWIENIA LISTY ====== */
 
 .list-settings {
-    margin-top: 20px;
+    margin-top: 12px;
 }
 
 .settings-toggle {
@@ -522,44 +527,244 @@ body.dark .edit-area strong {
     margin-right: auto;
 }
 
+.collapsible-section {
+    display: block;
+    animation: fadeSlide 0.35s ease;
+}
+
+.section-header {
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+
+.add-form button {
+    margin-top: 2px;
+}
+
+.add-form button {
+    min-width: 80px; /* skraca przycisk */
+}
+
+.add-form label {
+    font-size: 14px;
+    user-select: none;
+}
+
+.section {
+    background: #fdfaf6;
+    border-radius: 22px;
+    padding: 25px;
+    margin-bottom: 20px; /* odstęp między sekcjami */
+    box-shadow: 0 12px 30px rgba(120,95,70,.2);
+}
+
+.add-anime-section {
+    /* np. trochę jaśniejsze tło */
+    background: #fefbf7;
+}
+
+.anime-list-section {
+    /* standardowe tło */
+    background: #fdfaf6;
+}
+
+body.dark .section {
+    background: #2a2623;      /* ciemniejsze tło niż jasne */
+    box-shadow: 0 8px 20px rgba(0,0,0,.6); /* ciemniejszy cień */
+    border: 1px solid #3a3531; /* lekko widoczne, ciemniejsze obramowanie */
+}
+
+.section {
+    background: #fdfaf6;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 12px 30px rgba(120,95,70,.25);
+}
+
+/* DARK MODE */
+body.dark .section {
+    background: #2a2623;
+    box-shadow: 0 12px 30px rgba(0,0,0,.6);
+    border: 1px solid #3a3531;
+}
+
+body.dark .add-anime-section {
+    background: #322e2a;
+}
+
+/* ukryj domyślny checkbox */
+#completedCheckbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 40px;
+  height: 20px;
+  background: #ccc;
+  border-radius: 12px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* suwak wewnątrz checkboxa */
+#completedCheckbox::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+/* stan zaznaczonego checkboxa */
+#completedCheckbox:checked {
+  background: #4caf50;
+}
+
+#completedCheckbox:checked::before {
+  transform: translateX(20px);
+}
+
+/* opcjonalnie etykieta obok */
+label[for="completedCheckbox"] {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  user-select: none;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-switch .slider {
+  position: relative;
+  width: 42px;
+  height: 22px;
+  background: #c8ab90; /* tło suwaka nieaktywnego */
+  border-radius: 22px;
+  transition: background 0.3s;
+}
+
+.toggle-switch .slider::before {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 2px;
+  top: 2px;
+  background: #fdfaf6; /* kolor kółeczka */
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle-switch input:checked + .slider {
+  background: #8b5e3c; /* tło suwaka aktywnego */
+}
+
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+.add-form input,
+.add-form textarea {
+    margin-top: 8px; /* odstęp nad każdym polem */
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="container">
-<h1>Moja Anime Lista</h1>
+    <h1>Moja Anime Lista</h1>
 
-<div class="add-form">
-    <input id="title" placeholder="Tytuł anime">
-    <textarea id="note" placeholder="Opis / notatki"></textarea>
-    <input id="totalEpisodes" type="number" placeholder="Liczba odcinków sezonu 1">
-    <input id="poster" placeholder="URL plakatu (opcjonalnie)">
-    <button onclick="addAnime()">Dodaj anime</button>
-</div>
+    <!-- SEKACJA 1: DODAJ ANIME -->
+    <div class="section add-anime-section">
+<button class="settings-toggle section-header" onclick="toggleSection('addAnimeSection')">
+    🎉 Dodaj anime
+</button>
+<div id="addAnimeSection" class="collapsible-section">
+    <div class="add-form">
+        <input id="title" placeholder="Tytuł anime">
+        <textarea id="note" placeholder="Opis/notatki"></textarea>
+        <input id="totalEpisodes" type="number" placeholder="Liczba odcinków sezonu 1">
+        <input id="poster" placeholder="URL plakatu (opcjonalnie)">
 
-<h2>Oglądam</h2>
-<div id="watching"></div>
-
-<h2>Obejrzane</h2>
-<div id="completed"></div>
-<div class="list-settings">
-    <button class="settings-toggle" onclick="toggleListSettings()">
-        🛠️ Ustawienia listy
-    </button>
-
-    <div id="settingsPanel" class="settings-panel">
-        <div class="settings-icons">
-            <span onclick="exportAnimeJSON()" title="Export JSON">📤</span>
-            <span onclick="importAnimeJSON()" title="Import JSON">📥</span>
-            <span onclick="showStats()" title="Statystyki">📊</span>
-            <span onclick="toggleDarkMode()" title="Tryb nocny">🌙</span>
-            <span onclick="showAuthor()" title="Dobre słowo od twórcy stronki">🔒</span>
-
+        <div style="display:flex; align-items:center; gap:10px; margin-top:6px;">
+            <button style="flex-shrink:0; padding:8px 14px;" onclick="addAnime()">Dodaj</button>
+            <label class="toggle-switch">
+              <input type="checkbox" id="completedCheckbox">
+              <span class="slider"></span>
+              Ukończone
+            </label>
+			<label class="toggle-switch">
+			  <input type="checkbox" id="plannedCheckbox">
+			  <span class="slider"></span>
+			  Planuję
+			</label>
+			
         </div>
     </div>
 </div>
+
+    </div>
+
+    <!-- SEKACJA 2: LISTA ANIME -->
+    <div class="section anime-list-section">
+        <button class="settings-toggle section-header" onclick="toggleSection('watching')">
+            📺 Oglądam
+        </button>
+        <div id="watching" class="collapsible-section"></div>
+
+        <button class="settings-toggle section-header" onclick="toggleSection('completed')">
+            ⭐ Obejrzane
+        </button>
+        <div id="completed" class="collapsible-section"></div>
+		
+		<button class="settings-toggle section-header" onclick="toggleSection('planned')">
+			📌 Planuję
+		</button>
+		<div id="planned" class="collapsible-section"></div>
+		
+    </div>
+
+    <!-- SEKACJA 3: USTAWIENIA LISTY -->
+    <div class="section list-settings-section">
+        <button class="settings-toggle" onclick="toggleListSettings()">
+            🛠️ Ustawienia listy
+        </button>
+
+        <div id="settingsPanel" class="settings-panel">
+            <div class="settings-icons">
+                <span onclick="exportAnimeJSON()" title="Export JSON">📤</span>
+                <span onclick="importAnimeJSON()" title="Import JSON">📥</span>
+                <span onclick="showStats()" title="Statystyki">📊</span>
+                <span onclick="toggleDarkMode()" title="Tryb nocny">🌙</span>
+                <span onclick="showAuthor()" title="Dobre słowo od twórcy stronki">🔒</span>
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 <!-- MODAL STATYSTYK -->
 <div id="statsModal" class="modal">
@@ -573,7 +778,6 @@ body.dark .edit-area strong {
 <!-- MODAL PLAKATU -->
 <div id="posterModal" class="modal">
     <button class="close-btn" onclick="closeModal()">✖</button>
-    <button class="edit-poster-btn" onclick="changePoster()">🖌️</button>
     <img id="modalImage" class="modal-content">
 </div>
 
@@ -622,23 +826,48 @@ body.dark .edit-area strong {
 </div>
 
 <script>
-let currentPosterAnimeIndex = null;
+
 
 function addAnime() {
+    const note = document.getElementById('note');
+    const poster = document.getElementById('poster');
+    const completed = document.getElementById('completedCheckbox').checked; // <-- dodajemy
+	const planned = document.getElementById('plannedCheckbox').checked;
+	
     const title = document.getElementById('title').value.trim();
-    const total = parseInt(document.getElementById('totalEpisodes').value);
-    if (!title || !total) return;
+	const total = parseInt(document.getElementById('totalEpisodes').value);
+
+	if (!title || !total || total <= 0) {
+		alert('Podaj prawidłową liczbę odcinków (większą niż 0)');
+		return;
+	}
 
     const list = JSON.parse(localStorage.getItem('animeList') || '[]');
-    list.push({
-        title,
-        note: note.value,
-        poster: poster.value,
-        seasons: [{ name:'Sezon 1', episodes:0, totalEpisodes: total }]
-    });
+	list.push({
+		title,
+		note: note.value,
+		poster: poster.value,
+		planned: planned, // <--- nowa właściwość
+		seasons: [{
+			name: 'Sezon 1',
+			episodes: completed ? total : 0,
+			totalEpisodes: total
+		}]
+	});
+
+
     localStorage.setItem('animeList', JSON.stringify(list));
     loadList();
+
+    // ✨ wyczyszczenie pól po dodaniu
+    document.getElementById('title').value = '';
+    note.value = '';
+    document.getElementById('totalEpisodes').value = '';
+    poster.value = '';
+    document.getElementById('completedCheckbox').checked = false; // checkbox też czyszczony
+	document.getElementById('plannedCheckbox').checked = false;
 }
+
 
 function delAnime(i) {
     if (!confirm('Usunąć to anime?')) return;
@@ -668,20 +897,10 @@ function delSeason(i, si) {
 
 function showPoster(i) {
     const list = JSON.parse(localStorage.getItem('animeList'));
-    currentPosterAnimeIndex = i;
     modalImage.src = list[i].poster;
     posterModal.style.display = 'flex';
 }
 
-function changePoster() {
-    const url = prompt('Podaj nowy URL plakatu:');
-    if (!url) return;
-    const list = JSON.parse(localStorage.getItem('animeList'));
-    list[currentPosterAnimeIndex].poster = url;
-    localStorage.setItem('animeList', JSON.stringify(list));
-    modalImage.src = url;
-    loadList();
-}
 
 function closeModal(){ posterModal.style.display='none'; }
 
@@ -711,51 +930,79 @@ function saveEdit(i){
     list[i].note=document.getElementById(`note-${i}`).value;
     document.querySelectorAll(`#edit-${i} .edit-season input`)
         .forEach((inp,si)=>{
-            list[i].seasons[si].totalEpisodes=parseInt(inp.value);
-            if(list[i].seasons[si].episodes>inp.value)
-                list[i].seasons[si].episodes=inp.value;
+			const val = parseInt(inp.value);
+			if (!val || val <= 0) {
+				alert('Liczba odcinków musi być większa niż 0');
+				return;
+			}
+			list[i].seasons[si].totalEpisodes = val;
+			if(list[i].seasons[si].episodes > val)
+				list[i].seasons[si].episodes = val;
         });
     localStorage.setItem('animeList',JSON.stringify(list));
     loadList();
 }
 
 function loadList(){
+	const watching = document.getElementById('watching');
+    const completed = document.getElementById('completed');
+    const planned = document.getElementById('planned'); // <--- nowa kategoria
     let list = JSON.parse(localStorage.getItem('animeList') || '[]');
 
     list.sort((a, b) =>
         a.title.localeCompare(b.title, 'pl', { sensitivity: 'base' })
     );
-    watching.innerHTML=completed.innerHTML='';
+	watching.innerHTML = completed.innerHTML = planned.innerHTML = '';
     list.forEach((a,i)=>{
         const done=a.seasons.every(s=>s.episodes===s.totalEpisodes);
+		let moveButtonHTML = '';
+if (a.planned) {
+    moveButtonHTML = `
+        <div style="margin-top:6px;">
+            <button onclick="moveFromPlanned(${i}, false)">📺 Przenieś do Oglądam</button>
+            <button onclick="moveFromPlanned(${i}, true)">⭐ Przenieś do Obejrzane</button>
+        </div>
+    `;
+}
+
         const el=document.createElement('div');
         el.className='anime-item';
 
-        let seasonsHTML='';
-        a.seasons.forEach((s,si)=>{
-            seasonsHTML+=done
-            ? `<span class="season-badge">${s.name} · ${s.episodes}/${s.totalEpisodes}</span>`
-            : `<div class="season-row">
-                <strong>${s.name}</strong>
-                <button onclick="ep(${i},${si},-1)">◀</button>
-                <strong>${s.episodes}/${s.totalEpisodes}</strong>
-                <button onclick="ep(${i},${si},1)">▶</button>
-               </div>`;
-        });
+		let seasonsHTML = '';
+		a.seasons.forEach((s, si) => {
+			if (a.planned) {
+				// Planuję – zawsze 0/x, brak przycisków
+				seasonsHTML += `<span class="season-badge">${s.name} · 0/${s.totalEpisodes}</span>`;
+			} else if (done) {
+				// Ukończone – wyświetla badge z liczbą obejrzanych
+				seasonsHTML += `<span class="season-badge">${s.name} · ${s.episodes}/${s.totalEpisodes}</span>`;
+			} else {
+				// W trakcie oglądania – przyciski do liczenia
+				seasonsHTML += `<div class="season-row">
+					<strong>${s.name}</strong>
+					<button onclick="ep(${i},${si},-1)">◀</button>
+					<strong>${s.episodes}/${s.totalEpisodes}</strong>
+					<button onclick="ep(${i},${si},1)">▶</button>
+				</div>`;
+			}
+		});
+
 
         el.innerHTML=`
         <strong>${a.title}</strong>
         ${a.poster?`<button class="menu-btn" onclick="showPoster(${i})">🖼️</button>`:''}
         <button class="menu-btn" onclick="toggleMenuForAnime(event,${i})">⚙️</button>
 
-        <div class="action-menu" id="menu-${i}">
-            <button onclick="toggleEdit(${i})">✏️ Edytuj</button>
-            <button onclick="askDelete(${i})">🗑️ Usuń anime</button>
-        </div>
+	<div class="action-menu" id="menu-${i}">
+		<button onclick="toggleEdit(${i})">✏️ Edytuj</button>
+		<button onclick="changePosterDirect(${i})">🖼️ Ustaw / zmień plakat</button>
+		<button onclick="askDelete(${i})">🗑️ Usuń anime</button>
+	</div>
 
         <p>${a.note||''}</p>
         ${seasonsHTML}
-
+		${moveButtonHTML}  <!-- <<< TUTAJ -->
+		
         <div class="edit-area" id="edit-${i}">
             <input id="title-${i}" value="${a.title}">
             <textarea id="note-${i}">${a.note||''}</textarea>
@@ -771,7 +1018,13 @@ function loadList(){
             <button onclick="saveEdit(${i})">💾 Zapisz</button>
         </div>
         `;
-        (done?completed:watching).appendChild(el);
+if (a.planned) {
+    planned.appendChild(el);
+} else if (done) {
+    completed.appendChild(el);
+} else {
+    watching.appendChild(el);
+}
     });
     localStorage.setItem('animeList',JSON.stringify(list));
 }
@@ -849,9 +1102,11 @@ function showStats() {
     let completedAnime = 0;
     let totalEpisodes = 0;
     let watchedEpisodes = 0;
+	let plannedAnime = 0;
 
     list.forEach(a => {
         let done = true;
+		if (a.planned) plannedAnime++;
         a.seasons.forEach(s => {
             totalEpisodes += s.totalEpisodes;
             watchedEpisodes += s.episodes;
@@ -868,6 +1123,7 @@ function showStats() {
         <div class="stats-row stats-big">🎬 Anime <span>${totalAnime}</span></div>
         <div class="stats-row">✅ Obejrzane <span>${completedAnime}</span></div>
         <div class="stats-row">👀 W trakcie <span>${totalAnime - completedAnime}</span></div>
+		<div class="stats-row">📌 Planuję <span>${plannedAnime}</span></div>
 
         <div class="stats-row stats-big">📺 Odcinki</div>
         <div class="stats-row">✔️ Obejrzane <span>${watchedEpisodes}</span></div>
@@ -959,8 +1215,11 @@ function closeAddSeason() {
 }
 
 function confirmAddSeason() {
-    const total = parseInt(seasonEpisodesInput.value);
-    if (!total || total <= 0) return;
+	const total = parseInt(seasonEpisodesInput.value);
+	if (!total || total <= 0) {
+		alert('Podaj prawidłową liczbę odcinków sezonu (większą niż 0)');
+		return;
+	}
 
     const list = JSON.parse(localStorage.getItem('animeList'));
     const anime = list[addSeasonAnimeIndex];
@@ -995,6 +1254,71 @@ function sortSeasons(seasons) {
         return (isNaN(na) ? 999 : na) - (isNaN(nb) ? 999 : nb);
     });
 }
+
+function toggleSection(id) {
+    const el = document.getElementById(id);
+    const isHidden = el.style.display === 'none';
+
+    el.style.display = isHidden ? 'block' : 'none';
+
+    localStorage.setItem(`section-${id}`, isHidden ? 'open' : 'closed');
+}
+// inicjalizacja sekcji "Dodaj anime" po załadowaniu strony
+['watching', 'completed', 'addAnimeSection'].forEach(id => {
+    const state = localStorage.getItem(`section-${id}`);
+    if (state === 'closed') {
+        document.getElementById(id).style.display = 'none';
+    }
+});
+
+['watching', 'completed'].forEach(id => {
+    const state = localStorage.getItem(`section-${id}`);
+    if (state === 'closed') {
+        document.getElementById(id).style.display = 'none';
+    }
+});
+
+function changePosterDirect(i) {
+    const url = prompt('Podaj URL plakatu:');
+    if (!url) return;
+
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list[i].poster = url;
+
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
+const completedCheckbox = document.getElementById('completedCheckbox');
+const plannedCheckbox = document.getElementById('plannedCheckbox');
+
+completedCheckbox.addEventListener('change', () => {
+    if (completedCheckbox.checked) {
+        plannedCheckbox.checked = false;
+    }
+});
+
+plannedCheckbox.addEventListener('change', () => {
+    if (plannedCheckbox.checked) {
+        completedCheckbox.checked = false;
+    }
+});
+
+function moveFromPlanned(i, markCompleted) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    const anime = list[i];
+
+    anime.planned = false; // usuń flagę "Planuję"
+
+    if (markCompleted) {
+        // Oznaczamy jako ukończone
+        anime.seasons.forEach(s => s.episodes = s.totalEpisodes);
+    }
+
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
 
 </script>
 
