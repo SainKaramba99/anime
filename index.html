@@ -688,6 +688,15 @@ label[for="completedCheckbox"] {
     margin-bottom: 0;
 }
 
+select {
+    background:#3a3a3a;
+    color:white;
+    border:1px solid #555;
+    padding:4px;
+    border-radius:6px;
+}
+
+
 </style>
 </head>
 
@@ -744,6 +753,11 @@ label[for="completedCheckbox"] {
 		</button>
 		<div id="planned" class="collapsible-section"></div>
 		
+		<button class="settings-toggle section-header" onclick="toggleSection('dropped')">
+			🚫 Porzucone / Wstrzymane
+		</button>
+		<div id="dropped" class="collapsible-section"></div>
+				
     </div>
 
     <!-- SEKACJA 3: USTAWIENIA LISTY -->
@@ -847,13 +861,15 @@ function addAnime() {
 		title,
 		note: note.value,
 		poster: poster.value,
-		planned: planned, // <--- nowa właściwość
+		planned: planned,
+		dropped: false,        // <--- NOWE
 		seasons: [{
 			name: 'Sezon 1',
 			episodes: completed ? total : 0,
 			totalEpisodes: total
 		}]
 	});
+
 
 
     localStorage.setItem('animeList', JSON.stringify(list));
@@ -947,51 +963,64 @@ function loadList(){
 	const watching = document.getElementById('watching');
     const completed = document.getElementById('completed');
     const planned = document.getElementById('planned'); // <--- nowa kategoria
+	const dropped = document.getElementById('dropped');
+
     let list = JSON.parse(localStorage.getItem('animeList') || '[]');
 
     list.sort((a, b) =>
         a.title.localeCompare(b.title, 'pl', { sensitivity: 'base' })
     );
-	watching.innerHTML = completed.innerHTML = planned.innerHTML = '';
+	watching.innerHTML = completed.innerHTML = planned.innerHTML = dropped.innerHTML = '';
+
     list.forEach((a,i)=>{
         const done=a.seasons.every(s=>s.episodes===s.totalEpisodes);
-		let moveButtonHTML = '';
-if (a.planned) {
-    moveButtonHTML = `
-        <div style="margin-top:6px;">
-            <button onclick="moveFromPlanned(${i}, false)">📺 Przenieś do Oglądam</button>
-            <button onclick="moveFromPlanned(${i}, true)">⭐ Przenieś do Obejrzane</button>
-        </div>
-    `;
-}
+		let currentStatus = a.planned ? "planned" :
+                    a.dropped ? "dropped" :
+                    done ? "completed" : "watching";
 
         const el=document.createElement('div');
         el.className='anime-item';
 
 		let seasonsHTML = '';
-		a.seasons.forEach((s, si) => {
-			if (a.planned) {
-				// Planuję – zawsze 0/x, brak przycisków
-				seasonsHTML += `<span class="season-badge">${s.name} · 0/${s.totalEpisodes}</span>`;
-			} else if (done) {
-				// Ukończone – wyświetla badge z liczbą obejrzanych
-				seasonsHTML += `<span class="season-badge">${s.name} · ${s.episodes}/${s.totalEpisodes}</span>`;
-			} else {
-				// W trakcie oglądania – przyciski do liczenia
-				seasonsHTML += `<div class="season-row">
-					<strong>${s.name}</strong>
-					<button onclick="ep(${i},${si},-1)">◀</button>
-					<strong>${s.episodes}/${s.totalEpisodes}</strong>
-					<button onclick="ep(${i},${si},1)">▶</button>
-				</div>`;
-			}
-		});
+a.seasons.forEach((s,si)=>{
+    if (a.planned || a.dropped || done) {
+        // widok statyczny
+        seasonsHTML += `<span class="season-badge">${s.name} · ${s.episodes}/${s.totalEpisodes}</span>`;
+    } else {
+        // widok interaktywny
+        seasonsHTML += `
+        <div class="season-row">
+            <strong>${s.name}</strong>
+            <button onclick="ep(${i},${si},-1)">◀</button>
+            <strong>${s.episodes}/${s.totalEpisodes}</strong>
+            <button onclick="ep(${i},${si},1)">▶</button>
+        </div>`;
+    }
+});
+
+
 
 
         el.innerHTML=`
-        <strong>${a.title}</strong>
-        ${a.poster?`<button class="menu-btn" onclick="showPoster(${i})">🖼️</button>`:''}
-        <button class="menu-btn" onclick="toggleMenuForAnime(event,${i})">⚙️</button>
+<div style="display:flex; align-items:center; justify-content:space-between;">
+    <strong>${a.title}</strong>
+    
+    <div id="status-${i}" style="flex-shrink:0; margin-left: 20px;">
+        <select onchange="changeStatus(${i}, this.value)">
+            <option value="watching" ${currentStatus==="watching" ? "selected" : ""}>📺 Oglądam</option>
+            <option value="completed" ${currentStatus==="completed" ? "selected" : ""}>⭐ Ukończone</option>
+            <option value="planned" ${currentStatus==="planned" ? "selected" : ""}>📌 Planuję</option>
+            <option value="dropped" ${currentStatus==="dropped" ? "selected" : ""}>🚫 Porzucone</option>
+        </select>
+    </div>
+</div>
+
+
+
+
+
+${a.poster?`<button class="menu-btn" onclick="showPoster(${i})">🖼️</button>`:''}
+<button class="menu-btn" onclick="toggleMenuForAnime(event,${i})">⚙️</button>
 
 	<div class="action-menu" id="menu-${i}">
 		<button onclick="toggleEdit(${i})">✏️ Edytuj</button>
@@ -1001,7 +1030,6 @@ if (a.planned) {
 
         <p>${a.note||''}</p>
         ${seasonsHTML}
-		${moveButtonHTML}  <!-- <<< TUTAJ -->
 		
         <div class="edit-area" id="edit-${i}">
             <input id="title-${i}" value="${a.title}">
@@ -1020,12 +1048,26 @@ if (a.planned) {
         `;
 if (a.planned) {
     planned.appendChild(el);
+} else if (a.dropped) {
+    dropped.appendChild(el);
 } else if (done) {
     completed.appendChild(el);
 } else {
     watching.appendChild(el);
 }
+
     });
+	
+// --- TUTAJ DODAJEMY PRZESUNIĘCIE STATUSÓW ---
+list.forEach((a, i) => {
+    const statusEl = document.getElementById(`status-${i}`);
+    if (statusEl) {
+        statusEl.style.position = 'relative'; // lub 'absolute' jeśli chcesz całkowicie kontrolować
+        statusEl.style.left = '-90px';        // przesunięcie w prawo
+        statusEl.style.top = '13px';           // przesunięcie w dół
+    }
+});
+	
     localStorage.setItem('animeList',JSON.stringify(list));
 }
 loadList();
@@ -1318,6 +1360,56 @@ function moveFromPlanned(i, markCompleted) {
     localStorage.setItem('animeList', JSON.stringify(list));
     loadList();
 }
+
+function moveToDropped(i) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list[i].dropped = true;
+
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
+function restoreFromDropped(i) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    list[i].dropped = false;
+
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
+function changeStatus(i, newStatus) {
+    const list = JSON.parse(localStorage.getItem('animeList'));
+    const anime = list[i];
+
+    // Reset flag planowanych i porzuconych
+    anime.planned = false;
+    anime.dropped = false;
+
+    if (newStatus === "planned") {
+        anime.planned = true;
+
+    } else if (newStatus === "dropped") {
+        anime.dropped = true;
+
+    } else if (newStatus === "completed") {
+        // Ustaw wszystkie sezony jako ukończone
+        anime.seasons.forEach(s => s.episodes = s.totalEpisodes);
+
+    } else if (newStatus === "watching") {
+        // Jeśli wszystkie sezony są ukończone, otwórz modal dodania nowego sezonu
+        const allDone = anime.seasons.every(s => s.episodes === s.totalEpisodes);
+        if (allDone) {
+            openAddSeason(i); // funkcja już istnieje w Twoim kodzie
+        }
+        // Jeśli chcesz, możesz też zostawić dotychczasowe odcinki jako maksymalną wartość,
+        // żeby użytkownik nie tracił historii odcinków.
+    }
+
+    // Zapis i odświeżenie listy
+    localStorage.setItem('animeList', JSON.stringify(list));
+    loadList();
+}
+
 
 
 </script>
