@@ -1149,11 +1149,13 @@ function showStats() {
     let completedAnime = 0;
     let totalEpisodes = 0;
     let watchedEpisodes = 0;
-	let plannedAnime = 0;
+    let plannedAnime = 0;
+    let droppedAnime = 0; // <-- nowy licznik
 
     list.forEach(a => {
         let done = true;
-		if (a.planned) plannedAnime++;
+        if (a.planned) plannedAnime++;
+        if (a.dropped) droppedAnime++; // <-- tutaj liczymy porzucone
         a.seasons.forEach(s => {
             totalEpisodes += s.totalEpisodes;
             watchedEpisodes += s.episodes;
@@ -1169,8 +1171,9 @@ function showStats() {
     statsBody.innerHTML = `
         <div class="stats-row stats-big">🎬 Anime <span>${totalAnime}</span></div>
         <div class="stats-row">✅ Obejrzane <span>${completedAnime}</span></div>
-        <div class="stats-row">👀 W trakcie <span>${totalAnime - completedAnime}</span></div>
-		<div class="stats-row">📌 Planuję <span>${plannedAnime}</span></div>
+        <div class="stats-row">👀 W trakcie <span>${totalAnime - completedAnime - plannedAnime - droppedAnime}</span></div>
+        <div class="stats-row">📌 Planuję <span>${plannedAnime}</span></div>
+        <div class="stats-row">🚫 Porzucone <span>${droppedAnime}</span></div>
 
         <div class="stats-row stats-big">📺 Odcinki</div>
         <div class="stats-row">✔️ Obejrzane <span>${watchedEpisodes}</span></div>
@@ -1181,6 +1184,7 @@ function showStats() {
 
     statsModal.style.display = 'flex';
 }
+
 
 function closeStats() {
     statsModal.style.display = 'none';
