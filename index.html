@@ -1090,6 +1090,11 @@ function exportAnimeJSON() {
         return;
     }
 
+    // ✅ dodajemy potwierdzenie
+    if (!confirm('Czy na pewno chcesz wygenerować plik JSON z listą anime?')) {
+        return; // jeśli użytkownik kliknie "Anuluj", kończymy funkcję
+    }
+
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
@@ -1102,6 +1107,7 @@ function exportAnimeJSON() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
 
 function importAnimeJSON() {
     const input = document.createElement('input');
