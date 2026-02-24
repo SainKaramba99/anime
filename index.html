@@ -818,7 +818,7 @@ body:not(.dark) select {
     <button class="close-btn" onclick="closeAuthor()">✖</button>
 
     <div class="modal-content stats-content">
-        <h2>🤡 by Sain 🤡
+        <h2>👻 by Sain 👻
 
         <div id="authorText">
             <!-- ✏️ EDYTUJ TEKST AUTORA TUTAJ -->
@@ -1320,15 +1320,14 @@ function toggleSection(id) {
 
     localStorage.setItem(`section-${id}`, isHidden ? 'open' : 'closed');
 }
-// inicjalizacja sekcji "Dodaj anime" po załadowaniu strony
-['watching', 'completed', 'addAnimeSection'].forEach(id => {
-    const state = localStorage.getItem(`section-${id}`);
-    if (state === 'closed') {
-        document.getElementById(id).style.display = 'none';
-    }
-});
-
-['watching', 'completed'].forEach(id => {
+// Przywracanie stanu wszystkich sekcji po odświeżeniu
+[
+  'addAnimeSection',
+  'watching',
+  'completed',
+  'planned',
+  'dropped'
+].forEach(id => {
     const state = localStorage.getItem(`section-${id}`);
     if (state === 'closed') {
         document.getElementById(id).style.display = 'none';
